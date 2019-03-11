@@ -12,5 +12,13 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('chat');
 });
+
+Auth::routes();
+
+Route::post('messages', function (Illuminate\Http\Request $request) {
+    App\Events\Message::dispatch($request->input('body'));
+});
+
+Route::get('/home', 'HomeController@index')->name('home');

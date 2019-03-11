@@ -12,7 +12,6 @@ services:
       - 8080:80
     working_dir: ${APP_PATH_CONTAINER}
 
-  
   db:
     image: mariadb
     restart: always
@@ -20,6 +19,27 @@ services:
       MYSQL_ROOT_PASSWORD: 123456
     volumes: 
       - ${DB_PATH_HOST}:/var/lib/mysql  
+
+  redis:
+    container_name: 'redis'
+    image: redis:alpine
+
+  laravel-echo:
+    image: 'kylestev/laravel-echo-server:1.2.1'
+    container_name: 'laravel-echo-server'
+    ports:
+      - '6001:6001'
+    links:
+      - 'redis:redis'
+    volumes:
+      - /Users/kylestev/dd/laravel-echo-server.json:/app/laravel-echo-server.json:ro
+
+  node:
+    build: ./chat
+    volumes:
+      - ${APP_PATH_HOST}:${APP_PATH_CONTAINER}
+    working_dir: ${APP_PATH_CONTAINER}
+    command: npm run watch
 
   adminer:
     image: adminer
@@ -31,5 +51,5 @@ services:
     image: composer:1.6
     volumes:  
       - ${APP_PATH_HOST}:${APP_PATH_CONTAINER}
-    working_dir: ${APP_PATH_CONTAINER}    
+    working_dir: ${APP_PATH_CONTAINER}
     command: composer install
